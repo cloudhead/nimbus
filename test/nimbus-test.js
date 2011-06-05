@@ -15,7 +15,7 @@ var nimbus = require('lib/nimbus');
 // Setup database
 fs.writeFileSync(DBPATH, [
     {_id: 0, name: 'bob'},
-    {_id: 1, name: 'jon'},
+    {_id: 1, name: 'jon'},  // remove
     {_id: 2, name: 'bill'},
     {_id: 3, name: 'tuna'}, // get
     {_id: 4, name: 'pope'}  // update
@@ -84,6 +84,20 @@ vows.describe('nimbus').addBatch({
 
                     assert.isObject (db.get(4));
                     assert.equal    (db.get(4).name, 'Benedictus');
+                }
+            },
+            'when performing a *remove*': {
+                topic: function (db) {
+                    db.remove(1, this.callback);
+                },
+                'should remove the document from cache': function (res) {
+                    assert.isUndefined (this.db.store.cache[1]);
+                },
+                'should not load the document on future db load': function (res) {
+                    db = new(nimbus.DB);
+                    db.load(DBPATH);
+
+                    assert.isNull (db.get(1));
                 }
             }
         }
