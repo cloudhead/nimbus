@@ -18,7 +18,7 @@ fs.writeFileSync(DBPATH, [
     {_id: 2, name: 'bill'},
     {_id: 3, name: 'tuna'},
     {_id: 4, name: 'pope'}
-].map(JSON.stringify).join('\n'));
+].map(JSON.stringify).join('\n') + "\n");
 
 vows.describe('nimbus').addBatch({
     'A nimbus.DB instance': {
