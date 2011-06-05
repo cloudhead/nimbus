@@ -18,7 +18,7 @@ fs.writeFileSync(DBPATH, [
     {_id: 2, name: 'bill'},
     {_id: 3, name: 'tuna'},
     {_id: 4, name: 'pope'}
-].map(JSON.stringify).join('\n') + "\n");
+].map(JSON.stringify).join('\n') + '\n');
 
 vows.describe('nimbus').addBatch({
     'A nimbus.DB instance': {
@@ -45,6 +45,13 @@ vows.describe('nimbus').addBatch({
                 'should store the document in the cache': function (res) {
                     assert.isObject (this.db.store.cache[5]);
                     assert.equal    (this.db.store.cache[5].doc.name, 'mana');
+                },
+                'should store the document on disk': function (res) {
+                    db = new(nimbus.DB);
+                    db.load(DBPATH);
+
+                    assert.isObject (db.get(5));
+                    assert.equal    (db.get(5).name, 'mana');
                 },
                 'should set the *persisted* flag to `true`': function (res) {
                     assert.isTrue   (this.db.store.cache[5].persisted);
