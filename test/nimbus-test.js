@@ -1,4 +1,5 @@
 var path = require('path'),
+    util = require('util'),
     sys = require('sys'),
     fs = require('fs');
 
@@ -23,6 +24,10 @@ fs.writeFileSync(DBPATH, [
 vows.describe('nimbus').addBatch({
     'A nimbus.DB instance': {
         topic: new(nimbus.DB),
+
+        'should be inspectable': function (db) {
+            assert.doesNotThrow (function () { util.inspect(db) }, TypeError);
+        },
 
         'with an existing database loaded': {
             topic: function (db) {
