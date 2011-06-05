@@ -16,8 +16,8 @@ fs.writeFileSync(DBPATH, [
     {_id: 0, name: 'bob'},
     {_id: 1, name: 'jon'},
     {_id: 2, name: 'bill'},
-    {_id: 3, name: 'tuna'},
-    {_id: 4, name: 'pope'}
+    {_id: 3, name: 'tuna'}, // get
+    {_id: 4, name: 'pope'}  // update
 ].map(JSON.stringify).join('\n') + '\n');
 
 vows.describe('nimbus').addBatch({
@@ -66,6 +66,20 @@ vows.describe('nimbus').addBatch({
                 }
             },
             'when performing an *update*': {
+                topic: function (db) {
+                    db.update(4, {name: 'Benedictus'}, this.callback);
+                },
+                'should modify the document in cache': function (res) {
+                    assert.isObject (this.db.store.cache[4]);
+                    assert.equal    (this.db.store.cache[4].doc.name, 'Benedictus');
+                },
+                'should modify the document on disk': function (res) {
+                    db = new(nimbus.DB);
+                    db.load(DBPATH);
+
+                    assert.isObject (db.get(4));
+                    assert.equal    (db.get(4).name, 'Benedictus');
+                }
             }
         }
     }
