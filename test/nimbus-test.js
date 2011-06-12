@@ -14,9 +14,9 @@ var nimbus = require('lib/nimbus');
 
 // Setup database
 fs.writeFileSync(DBPATH, [
-    {_id: 0, name: 'bob'},
+    {_id: 0, name: 'bob'},  // filter
     {_id: 1, name: 'jon'},  // remove
-    {_id: 2, name: 'bill'},
+    {_id: 2, name: 'bill'}, // filter
     {_id: 3, name: 'tuna'}, // get
     {_id: 4, name: 'pope'}  // update
 ].map(JSON.stringify).join('\n') + '\n');
@@ -31,8 +31,8 @@ vows.describe('nimbus').addBatch({
 
         'with an existing database loaded': {
             topic: function (db) {
-                this.db = db;
-                return db.load(DBPATH);
+                db.load(DBPATH);
+                return this.db = db;
             },
             'when performing a *get* with an id': {
                 topic: function (db) {
@@ -98,6 +98,18 @@ vows.describe('nimbus').addBatch({
                     db.load(DBPATH);
 
                     assert.isNull (db.get(1));
+                }
+            },
+            'when performing a *filter*': {
+                topic: function (db) {
+                    return db.filter(function (doc) {
+                        return doc.name.match(/^b/);
+                    });
+                },
+                'should return documents for which the callback returns true': function (res) {
+                    names = res.map(function (doc) { return doc.name });
+                    assert.include(names, 'bob' );
+                    assert.include(names, 'bill');
                 }
             }
         }
