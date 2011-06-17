@@ -18,7 +18,11 @@ fs.writeFileSync(DBPATH, [
     {_id: 1, name: 'jon'},  // remove
     {_id: 2, name: 'bill'}, // filter
     {_id: 3, name: 'tuna'}, // get
-    {_id: 4, name: 'pope'}  // update
+    {_id: 4, name: 'pope'}, // update
+ //       5                 // put
+ //       6                 // changes (put)
+    {_id: 7, name: 'tux'},  // changes (update)
+    {_id: 8, name: 'mer'}   // changes (remove)
 ].map(JSON.stringify).join('\n') + '\n');
 
 vows.describe('nimbus').addBatch({
@@ -111,6 +115,52 @@ vows.describe('nimbus').addBatch({
                     assert.include(names, 'bob' );
                     assert.include(names, 'bill');
                 }
+            },
+        },
+        'when registering for *changes* and creating a document': {
+            topic: function () {
+                var that = this;
+                db = new(nimbus.DB);
+                db.load(DBPATH);
+                db.changes(function (eventType, doc) { that.callback(null, eventType, doc) });
+                db.put({_id: 6, name: 'voldemort'});
+            },
+            'should be notified of the new document': function (err, eventType, doc) {
+                assert.equal    (eventType, 'put');
+                assert.isObject (doc);
+                assert.equal    (doc.name, 'voldemort');
+                assert.equal    (doc._id, 6);
+            }
+        },
+        'when registering for *changes* and updating a document': {
+            topic: function () {
+                var that = this;
+                db = new(nimbus.DB);
+                db.load(DBPATH);
+                db.changes(function (eventType, doc) { that.callback(null, eventType, doc) });
+                db.update(7, {name: 'Beastie'});
+            },
+            'should be notified of the updated document': function (err, eventType, doc) {
+                assert.equal    (eventType, 'update');
+                assert.isObject (doc);
+                assert.equal    (doc.name, 'Beastie');
+                assert.equal    (doc._id, 7);
+            }
+        },
+        'when registering for *changes* and removing a document': {
+            topic: function () {
+                var that = this;
+                db = this.db = new(nimbus.DB);
+                db.load(DBPATH);
+                db.changes(function (eventType, doc) { that.callback(null, eventType, doc) });
+                assert.isObject (db.get(8));
+                db.remove(8);
+            },
+            'should be notified of the updated document': function (err, eventType, doc) {
+                assert.equal    (eventType, 'remove');
+                assert.isObject (doc);
+                assert.equal    (doc.name, 'mer');
+                assert.equal    (doc._id, 8);
             }
         }
     }
