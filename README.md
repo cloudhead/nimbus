@@ -28,6 +28,10 @@ synopsis
         }
     }); // The data is in memory.
 
+    db.changes(function (eventType, doc) {
+        eventType // 'put', 'update', 'remove'
+    }); // event stream
+
 More information coming soon.
 
 license

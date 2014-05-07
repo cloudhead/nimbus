@@ -1,0 +1,12 @@
+{
+  "name"          : "nimbus",
+  "description"   : "nimble, durable, document store",
+  "url"           : "https://github.com/cloudhead/nimbus",
+  "keywords"      : ["doc", "document", "store", "database"],
+  "author"        : "Alexis Sellier <self@cloudhead.net>",
+  "contributors"  : [],
+  "main"          : "./lib/nimbus",
+  "directories"   : { "test": "./test" },
+  "version"       : "0.1.0",
+  "engines"       : {"node": ">=0.2.6"}
+}
